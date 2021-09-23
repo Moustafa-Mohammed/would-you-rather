@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
+import { Progress } from "semantic-ui-react";
+
 import { handleSaveAnswer } from "../actions/shared";
 
 class QuestionDetails extends Component {
@@ -20,6 +22,8 @@ class QuestionDetails extends Component {
       optionOneSelected,
       optionTwoSelected,
       loginUser,
+      optionOnePercentage,
+      optionTwoPercentage,
     } = this.props;
 
     if (!loginUser) {
@@ -83,13 +87,19 @@ class QuestionDetails extends Component {
           </div>
         )}
         {(optionOneSelected === true || optionTwoSelected === true) && (
-          <div className="board-box">
+          <div>
             <div className="board-content">
               <div className="board-box-sm">
                 <p className="ui header blue">{question.optionOne.text}</p>
                 <p className="ui header blue">
                   Votes: {question.optionOne.votes.length}
                 </p>
+                <Progress
+                  inverted
+                  color="blue"
+                  percent={optionOnePercentage}
+                  progress
+                />
                 {optionOneSelected && (
                   <h3 className="ui header green">Your choice</h3>
                 )}
@@ -99,6 +109,12 @@ class QuestionDetails extends Component {
                 <p className="ui header brown">
                   Votes: {question.optionTwo.votes.length}
                 </p>
+                <Progress
+                  inverted
+                  color="brown"
+                  percent={optionTwoPercentage}
+                  progress
+                />
                 {optionTwoSelected && (
                   <h3 className="ui header green">Your choice</h3>
                 )}
@@ -126,6 +142,21 @@ function mapStateToProps({ questions, users, loginUser }, props) {
       ? questions[id].optionTwo.votes.indexOf(loginUser) > -1
       : null,
     loginUser,
+    optionOnePercentage: questions[id]
+      ? (
+          questions[id].optionOne.votes.length /
+          (questions[id].optionOne.votes.length +
+            questions[id].optionTwo.votes.length)
+        ).toFixed(2) * 100
+      : null,
+
+    optionTwoPercentage: questions[id]
+      ? (
+          questions[id].optionTwo.votes.length /
+          (questions[id].optionOne.votes.length +
+            questions[id].optionTwo.votes.length)
+        ).toFixed(2) * 100
+      : null,
   };
 }
 
